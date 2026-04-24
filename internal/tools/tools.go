@@ -6,8 +6,10 @@
 // the public Librarium API via the shared client, project the response
 // into a shape that's compact and useful inside an LLM conversation.
 //
-// The catalogue in this PR is intentionally read-only: list_libraries,
-// search_books, get_book. Writes land in the next PR.
+// v1 catalogue:
+//   - reads: list_libraries, search_books, get_book, lookup_isbn,
+//     get_recent_suggestions
+//   - writes: add_book_by_isbn, set_read_status, set_rating, write_review
 package tools
 
 import (
@@ -19,7 +21,16 @@ import (
 // Keeps the main.go wiring to one call regardless of how the tool count
 // grows; new tool files just add one more Add* to this function.
 func RegisterAll(srv *mcp.Server, client *api.Client) {
+	// Reads
 	AddListLibraries(srv, client)
 	AddSearchBooks(srv, client)
 	AddGetBook(srv, client)
+	AddLookupISBN(srv, client)
+	AddGetRecentSuggestions(srv, client)
+
+	// Writes
+	AddAddBookByISBN(srv, client)
+	AddSetReadStatus(srv, client)
+	AddSetRating(srv, client)
+	AddWriteReview(srv, client)
 }
