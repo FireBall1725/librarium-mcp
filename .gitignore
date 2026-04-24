@@ -1,0 +1,20 @@
+# Go build output
+/mcp
+/librarium-mcp
+*.test
+*.out
+
+# Local env overrides
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS junk
+.DS_Store
+
+# Persisted first-run MCP token — dev may generate one at ./data
+/data/
