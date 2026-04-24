@@ -2,7 +2,7 @@
 
 Model Context Protocol server for [Librarium](https://librarium.press). Chat with your self-hosted library from Claude Desktop, Cursor, Claude Code, or any MCP-aware client.
 
-> ⚠︎ **Early beta.** v1 ships the tool catalogue below; MCP resources are deferred to v1.1. See the [plan doc](https://github.com/fireball1725/librarium/blob/main/plans/librarium-mcp.md) for the full rollout.
+> ⚠︎ **Early beta.** v1 ships the tool catalogue below; MCP resources are deferred to v1.1.
 
 ## How it works
 
