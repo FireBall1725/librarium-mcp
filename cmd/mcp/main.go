@@ -21,7 +21,9 @@ import (
 
 	"github.com/fireball1725/librarium-mcp/internal/api"
 	"github.com/fireball1725/librarium-mcp/internal/config"
+	"github.com/fireball1725/librarium-mcp/internal/tools"
 	"github.com/fireball1725/librarium-mcp/internal/version"
+	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
 func main() {
@@ -42,12 +44,23 @@ func main() {
 	// A single Librarium API client is shared across all incoming MCP
 	// sessions — there's only one identity on this server (the minting
 	// user's PAT), so there's nothing session-specific to isolate.
-	_ = api.New(cfg.LibrariumURL, cfg.LibrariumToken)
+	client := api.New(cfg.LibrariumURL, cfg.LibrariumToken)
+
+	// One MCP server instance, reused across every incoming session. All
+	// sessions operate as the same Librarium user so there's no per-request
+	// configuration we'd need to vary.
+	mcpServer := mcp.NewServer(&mcp.Implementation{
+		Name:    "librarium",
+		Version: version.BuildVersion,
+	}, nil)
+	tools.RegisterAll(mcpServer, client)
+	mcpHandler := mcp.NewStreamableHTTPHandler(func(*http.Request) *mcp.Server {
+		return mcpServer
+	}, nil)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /health", healthHandler)
-	mux.Handle("POST /mcp", requireBearer(cfg.MCPToken, http.HandlerFunc(mcpPlaceholder)))
-	mux.Handle("GET /mcp", requireBearer(cfg.MCPToken, http.HandlerFunc(mcpPlaceholder)))
+	mux.Handle("/mcp", requireBearer(cfg.MCPToken, mcpHandler))
 
 	srv := &http.Server{
 		Addr:              cfg.Listen,
@@ -80,18 +93,6 @@ func healthHandler(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(map[string]any{
 		"status":  "ok",
-		"version": version.BuildVersion,
-	})
-}
-
-// mcpPlaceholder answers authenticated /mcp probes while the actual MCP
-// handler is still being wired up. The first-tools PR replaces this with
-// the real streamable-HTTP handler from github.com/modelcontextprotocol/go-sdk.
-func mcpPlaceholder(w http.ResponseWriter, _ *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusNotImplemented)
-	_ = json.NewEncoder(w).Encode(map[string]any{
-		"error":   "mcp handler not wired yet",
 		"version": version.BuildVersion,
 	})
 }
