@@ -99,12 +99,7 @@ func AddListLibraries(srv *mcp.Server, client *api.Client) {
 		}
 		out := make([]Library, len(libs))
 		for i, l := range libs {
-			out[i] = Library{
-				ID:          l.ID,
-				Name:        l.Name,
-				Description: l.Description,
-				IsPublic:    l.IsPublic,
-			}
+			out[i] = Library(l)
 		}
 		return nil, listLibrariesResult{Libraries: out}, nil
 	})
@@ -287,23 +282,23 @@ func AddGetBook(srv *mcp.Server, client *api.Client) {
 func projectBook(b apiBook) Book {
 	contribs := make([]contributorRef, len(b.Contributors))
 	for i, c := range b.Contributors {
-		contribs[i] = contributorRef{Name: c.Name, Role: c.Role}
+		contribs[i] = contributorRef(c)
 	}
 	tags := make([]namedRef, len(b.Tags))
 	for i, t := range b.Tags {
-		tags[i] = namedRef{ID: t.ID, Name: t.Name}
+		tags[i] = namedRef(t)
 	}
 	genres := make([]namedRef, len(b.Genres))
 	for i, g := range b.Genres {
-		genres[i] = namedRef{ID: g.ID, Name: g.Name}
+		genres[i] = namedRef(g)
 	}
 	libs := make([]namedRef, len(b.Libraries))
 	for i, l := range b.Libraries {
-		libs[i] = namedRef{ID: l.ID, Name: l.Name}
+		libs[i] = namedRef(l)
 	}
 	series := make([]seriesRef, len(b.Series))
 	for i, s := range b.Series {
-		series[i] = seriesRef{Name: s.Name, Position: s.Position}
+		series[i] = seriesRef(s)
 	}
 	return Book{
 		ID:           b.ID,
