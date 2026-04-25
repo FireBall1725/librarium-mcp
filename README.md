@@ -1,8 +1,20 @@
 # librarium-mcp
 
-Model Context Protocol server for [Librarium](https://librarium.press). Chat with your self-hosted library from Claude Desktop, Cursor, Claude Code, or any MCP-aware client.
+Model Context Protocol server for **[Librarium](https://librarium.press)** — a self-hosted, privacy-focused tracker for your physical book, manga, and comic collection. A self-hosted alternative to Libib and similar cloud catalog services.
 
-> ⚠︎ **Early beta.** v1 ships the tool catalogue below; MCP resources are deferred to v1.1.
+Chat with your library from Claude Desktop, Cursor, Claude Code, or any MCP-aware client. Go · streamable HTTP. Talks to [`librarium-api`](https://github.com/fireball1725/librarium-api) like any other client.
+
+> ⚠︎ **Early beta.** Things are changing fast, some edges are rough, and self-hosters should expect to read release notes before upgrading. v1 ships the tool catalogue below; MCP resources are deferred to v1.1.
+
+Part of the Librarium stack:
+
+| Repo                                                                              | Role                                                                       |
+| --------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| [`librarium`](https://github.com/fireball1725/librarium)                          | Marketing site at [librarium.press](https://librarium.press), planning docs |
+| [`librarium-api`](https://github.com/fireball1725/librarium-api)                  | Backend · Go · Postgres · River jobs                                       |
+| [`librarium-web`](https://github.com/fireball1725/librarium-web)                  | Web client · React · TypeScript · Tailwind · Vite                          |
+| [`librarium-ios`](https://github.com/fireball1725/librarium-ios)                  | Native iOS client · SwiftUI · iOS 26+ (TestFlight)                         |
+| [`librarium-mcp`](https://github.com/fireball1725/librarium-mcp) ← **you are here** | MCP server · Go · chat with your library from Claude / Cursor / etc.     |
 
 ## How it works
 
