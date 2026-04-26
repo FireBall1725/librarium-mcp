@@ -21,6 +21,7 @@ import (
 
 	"github.com/fireball1725/librarium-mcp/internal/api"
 	"github.com/fireball1725/librarium-mcp/internal/config"
+	"github.com/fireball1725/librarium-mcp/internal/resources"
 	"github.com/fireball1725/librarium-mcp/internal/tools"
 	"github.com/fireball1725/librarium-mcp/internal/version"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
@@ -54,6 +55,7 @@ func main() {
 		Version: version.BuildVersion,
 	}, nil)
 	tools.RegisterAll(mcpServer, client)
+	resources.RegisterAll(mcpServer, client)
 	mcpHandler := mcp.NewStreamableHTTPHandler(func(*http.Request) *mcp.Server {
 		return mcpServer
 	}, nil)
