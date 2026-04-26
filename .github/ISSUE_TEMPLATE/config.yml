@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Cross-cutting / roadmap discussion
+    url: https://github.com/fireball1725/librarium/issues
+    about: For ideas that span api/web/ios/mcp, file on the umbrella librarium repo.
+  - name: API issues
+    url: https://github.com/fireball1725/librarium-api/issues
+    about: If a tool is returning data that's wrong at the source, file on the API instead.

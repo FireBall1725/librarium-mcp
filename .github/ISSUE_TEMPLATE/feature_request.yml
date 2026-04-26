@@ -1,0 +1,41 @@
+name: Feature request
+description: Suggest a new tool, prompt, or behaviour for the MCP server
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Feature requests are welcome. Check existing issues + [PLAN.md](https://github.com/fireball1725/librarium/blob/main/PLAN.md) before submitting to avoid duplicates.
+
+        If the underlying API needs to change too, file a companion issue on [librarium-api](https://github.com/fireball1725/librarium-api/issues).
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: What can't you do with the current tools?
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: New tool name + parameters + return shape, or a behaviour change to an existing tool.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you've considered
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Example prompts / model conversations
+      description: How would a user phrase the request that should trigger this tool?
+    validations:
+      required: false
