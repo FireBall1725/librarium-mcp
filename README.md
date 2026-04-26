@@ -4,7 +4,7 @@ Model Context Protocol server for **[Librarium](https://librarium.press)** — a
 
 Chat with your library from Claude Desktop, Cursor, Claude Code, or any MCP-aware client. Go · streamable HTTP. Talks to [`librarium-api`](https://github.com/fireball1725/librarium-api) like any other client.
 
-> ⚠︎ **Early beta.** Things are changing fast, some edges are rough, and self-hosters should expect to read release notes before upgrading. v1 ships the tool catalogue below; MCP resources are deferred to v1.1.
+> ⚠︎ **Early beta.** Things are changing fast, some edges are rough, and self-hosters should expect to read release notes before upgrading.
 
 Part of the Librarium stack:
 
@@ -44,6 +44,23 @@ Every tool inherits the permissions of the `lbrm_pat_*` token you configured, so
 | `write_review` | `book_id`, `library_id`, `notes?`, `review?`, `is_favorite?`, `edition_id?` | Updated interaction. Notes are private; review is visible to other library members. |
 
 Write tools auto-resolve `edition_id` to the book's primary edition when it's omitted, and use a read-merge-write pattern against the api so a partial update doesn't clobber fields the caller didn't touch.
+
+## Resources
+
+Resources are read-only catalog views the LLM (or end-user via `/resource` UI) can pull on demand without consuming a tool-call slot. Useful for "show me what's in my library" prompts where a tool would be wasteful. Same outbound auth as tools — every resource respects the configured `lbrm_pat_*` token's scope.
+
+| URI | Returns |
+|---|---|
+| `librarium://libraries` | Every library the current user can access. |
+| `librarium://library/{id}` | Single library metadata (no book list). |
+| `librarium://library/{id}/books` | First page of books in a library. Use `search_books` for filtering. |
+| `librarium://library/{id}/series` | Every series tracked in a library. |
+| `librarium://library/{lib}/series/{sid}` | Single series detail with status, total volumes, and arcs. |
+| `librarium://book/{id}` | Single book detail (library-agnostic). |
+| `librarium://suggestions/recent` | Most recent AI suggestions with lifecycle status. |
+| `librarium://stats` | Aggregate counts across every library the current user can see. |
+
+All resources return `application/json`. Templated URIs use RFC 6570 `{name}` placeholders.
 
 ## Quick start
 
