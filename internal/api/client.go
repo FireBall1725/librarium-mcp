@@ -107,6 +107,31 @@ func Put[Req, Resp any](ctx context.Context, c *Client, path string, req Req) (R
 	return env.Data, nil
 }
 
+// Patch mirrors Post for PATCH requests.
+func Patch[Req, Resp any](ctx context.Context, c *Client, path string, req Req) (Resp, error) {
+	var zero Resp
+	buf, err := json.Marshal(req)
+	if err != nil {
+		return zero, fmt.Errorf("encoding %s body: %w", path, err)
+	}
+	respBody, err := c.doRaw(ctx, http.MethodPatch, path, buf)
+	if err != nil {
+		return zero, err
+	}
+	var env envelope[Resp]
+	if err := json.Unmarshal(respBody, &env); err != nil {
+		return zero, fmt.Errorf("decoding %s: %w", path, err)
+	}
+	return env.Data, nil
+}
+
+// Delete sends a DELETE and ignores the response body. Returns an Error
+// for non-2xx so callers can distinguish "deleted" from "didn't exist".
+func Delete(ctx context.Context, c *Client, path string) error {
+	_, err := c.doRaw(ctx, http.MethodDelete, path, nil)
+	return err
+}
+
 // doRaw is the shared HTTP execute path. Returns the raw response body for
 // the generic decoders above to unmarshal.
 func (c *Client) doRaw(ctx context.Context, method, path string, body []byte) ([]byte, error) {

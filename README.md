@@ -33,6 +33,7 @@ Every tool inherits the permissions of the `lbrm_pat_*` token you configured, so
 | `get_book` | `book_id` | Full book record: contributors, tags, genres, series, libraries, your read status. |
 | `lookup_isbn` | `isbn` | Provider-merged catalog lookup (Google Books, Open Library, Hardcover, …). Same call the iOS scan flow uses. |
 | `get_recent_suggestions` | `limit?` (default 5, max 25) | Recent AI suggestion runs with their books, reasoning, and per-suggestion status. |
+| `list_loans` | `library_id`, `book_id?`, `include_returned?` | Active-only by default; opt-in to returned, narrow to one book. |
 
 ### Write
 
@@ -42,6 +43,9 @@ Every tool inherits the permissions of the `lbrm_pat_*` token you configured, so
 | `set_read_status` | `book_id`, `library_id`, `status` (unread/reading/read/did_not_finish), `edition_id?` | Updated interaction. |
 | `set_rating` | `book_id`, `library_id`, `rating` (1–10 half-star integer, or null to clear), `edition_id?` | Updated interaction. |
 | `write_review` | `book_id`, `library_id`, `notes?`, `review?`, `is_favorite?`, `edition_id?` | Updated interaction. Notes are private; review is visible to other library members. |
+| `create_loan` | `library_id`, `book_id`, `loaned_to`, `loaned_at?`, `due_date?`, `notes?` | Records a book lent to someone. `loaned_at` defaults to today. |
+| `mark_loan_returned` | `library_id`, `loan_id`, `returned_at?` | Marks an active loan returned. Preserves borrower / due date / notes / tags. |
+| `delete_loan` | `library_id`, `loan_id` | Removes a loan record entirely. Prefer `mark_loan_returned` for normal returns. |
 
 Write tools auto-resolve `edition_id` to the book's primary edition when it's omitted, and use a read-merge-write pattern against the api so a partial update doesn't clobber fields the caller didn't touch.
 
@@ -55,8 +59,10 @@ Resources are read-only catalog views the LLM (or end-user via `/resource` UI) c
 | `librarium://library/{id}` | Single library metadata (no book list). |
 | `librarium://library/{id}/books` | First page of books in a library. Use `search_books` for filtering. |
 | `librarium://library/{id}/series` | Every series tracked in a library. |
+| `librarium://library/{id}/loans` | Every active loan in a library. |
 | `librarium://library/{lib}/series/{sid}` | Single series detail with status, total volumes, and arcs. |
 | `librarium://book/{id}` | Single book detail (library-agnostic). |
+| `librarium://book/{id}/loans` | Every loan ever recorded for a book (active + returned), across every library the user can see. |
 | `librarium://suggestions/recent` | Most recent AI suggestions with lifecycle status. |
 | `librarium://stats` | Aggregate counts across every library the current user can see. |
 

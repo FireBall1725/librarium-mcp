@@ -15,8 +15,10 @@
 //   - librarium://library/{id}
 //   - librarium://library/{id}/books
 //   - librarium://library/{id}/series
+//   - librarium://library/{id}/loans
 //   - librarium://library/{lib}/series/{sid}
 //   - librarium://book/{id}
+//   - librarium://book/{id}/loans
 //   - librarium://suggestions/recent
 //   - librarium://stats
 package resources
@@ -39,6 +41,8 @@ func RegisterAll(srv *mcp.Server, client *api.Client) {
 	AddBookDetail(srv, client)
 	AddSuggestionsRecent(srv, client)
 	AddStats(srv, client)
+	AddLibraryLoans(srv, client)
+	AddBookLoans(srv, client)
 }
 
 // apiError translates a librarium api.Error into the MCP error shape.
