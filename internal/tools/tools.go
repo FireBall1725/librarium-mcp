@@ -7,9 +7,10 @@
 // into a shape that's compact and useful inside an LLM conversation.
 //
 // v1 catalogue:
-//   - reads: list_libraries, search_books, get_book, lookup_isbn,
-//     get_recent_suggestions
-//   - writes: add_book_by_isbn, set_read_status, set_rating, write_review
+//   - reads:  list_libraries, search_books, get_book, lookup_isbn,
+//             get_recent_suggestions, list_loans
+//   - writes: add_book_by_isbn, set_read_status, set_rating, write_review,
+//             create_loan, mark_loan_returned, delete_loan
 package tools
 
 import (
@@ -27,6 +28,12 @@ func RegisterAll(srv *mcp.Server, client *api.Client) {
 	AddGetBook(srv, client)
 	AddLookupISBN(srv, client)
 	AddGetRecentSuggestions(srv, client)
+
+	// Loans
+	AddListLoans(srv, client)
+	AddCreateLoan(srv, client)
+	AddMarkLoanReturned(srv, client)
+	AddDeleteLoan(srv, client)
 
 	// Writes
 	AddAddBookByISBN(srv, client)
