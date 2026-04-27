@@ -19,45 +19,33 @@ import (
 
 // apiLoan is the loan body returned by the api list / patch endpoints.
 type apiLoan struct {
-	ID         string         `json:"id"`
-	LibraryID  string         `json:"library_id"`
-	BookID     string         `json:"book_id"`
-	BookTitle  string         `json:"book_title"`
-	LoanedTo   string         `json:"loaned_to"`
-	LoanedAt   string         `json:"loaned_at"`
-	DueDate    *string        `json:"due_date"`
-	ReturnedAt *string        `json:"returned_at"`
-	Notes      string         `json:"notes"`
-	Tags       []apiLoanTag   `json:"tags"`
-}
-
-type apiLoanTag struct {
-	ID    string `json:"id"`
-	Name  string `json:"name"`
-	Color string `json:"color"`
+	ID         string  `json:"id"`
+	LibraryID  string  `json:"library_id"`
+	BookID     string  `json:"book_id"`
+	BookTitle  string  `json:"book_title"`
+	LoanedTo   string  `json:"loaned_to"`
+	LoanedAt   string  `json:"loaned_at"`
+	DueDate    *string `json:"due_date"`
+	ReturnedAt *string `json:"returned_at"`
+	Notes      string  `json:"notes"`
 }
 
 // LoanSummary is the trimmed shape we hand back to the LLM. Drops fields
 // the model rarely needs (created_at/updated_at) and renames the timestamps
 // to make their semantics obvious.
 type LoanSummary struct {
-	ID         string   `json:"id"`
-	BookID     string   `json:"book_id"`
-	BookTitle  string   `json:"book_title"`
-	LoanedTo   string   `json:"loaned_to"`
-	LoanedAt   string   `json:"loaned_at"`
-	DueDate    *string  `json:"due_date,omitempty"`
-	ReturnedAt *string  `json:"returned_at,omitempty"`
-	Notes      string   `json:"notes,omitempty"`
-	Tags       []string `json:"tags,omitempty"`
-	IsActive   bool     `json:"is_active"`
+	ID         string  `json:"id"`
+	BookID     string  `json:"book_id"`
+	BookTitle  string  `json:"book_title"`
+	LoanedTo   string  `json:"loaned_to"`
+	LoanedAt   string  `json:"loaned_at"`
+	DueDate    *string `json:"due_date,omitempty"`
+	ReturnedAt *string `json:"returned_at,omitempty"`
+	Notes      string  `json:"notes,omitempty"`
+	IsActive   bool    `json:"is_active"`
 }
 
 func projectLoan(l apiLoan) LoanSummary {
-	tags := make([]string, 0, len(l.Tags))
-	for _, t := range l.Tags {
-		tags = append(tags, t.Name)
-	}
 	return LoanSummary{
 		ID:         l.ID,
 		BookID:     l.BookID,
@@ -67,7 +55,6 @@ func projectLoan(l apiLoan) LoanSummary {
 		DueDate:    l.DueDate,
 		ReturnedAt: l.ReturnedAt,
 		Notes:      l.Notes,
-		Tags:       tags,
 		IsActive:   l.ReturnedAt == nil,
 	}
 }
@@ -76,11 +63,10 @@ func projectLoan(l apiLoan) LoanSummary {
 // rewrite, so callers must read the loan first and merge the field they
 // want to change — see findLoanByID + markReturned below.
 type loanPatchBody struct {
-	LoanedTo   string   `json:"loaned_to"`
-	DueDate    *string  `json:"due_date"`
-	ReturnedAt *string  `json:"returned_at"`
-	Notes      string   `json:"notes"`
-	TagIDs     []string `json:"tag_ids"`
+	LoanedTo   string  `json:"loaned_to"`
+	DueDate    *string `json:"due_date"`
+	ReturnedAt *string `json:"returned_at"`
+	Notes      string  `json:"notes"`
 }
 
 // findLoanByID hits the list endpoint and picks out the matching row.
@@ -237,16 +223,11 @@ func AddMarkLoanReturned(srv *mcp.Server, client *api.Client) {
 		if returnedAt == "" {
 			returnedAt = time.Now().Format("2006-01-02")
 		}
-		tagIDs := make([]string, 0, len(cur.Tags))
-		for _, t := range cur.Tags {
-			tagIDs = append(tagIDs, t.ID)
-		}
 		body := loanPatchBody{
 			LoanedTo:   cur.LoanedTo,
 			DueDate:    cur.DueDate,
 			ReturnedAt: &returnedAt,
 			Notes:      cur.Notes,
-			TagIDs:     tagIDs,
 		}
 		path := fmt.Sprintf("/api/v1/libraries/%s/loans/%s", args.LibraryID, args.LoanID)
 		updated, err := api.Patch[loanPatchBody, apiLoan](ctx, client, path, body)
