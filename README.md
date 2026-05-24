@@ -1,6 +1,6 @@
 # librarium-mcp
 
-Model Context Protocol server for **[Librarium](https://librarium.press)** — a self-hosted, privacy-focused tracker for your physical book, manga, and comic collection. A self-hosted alternative to Libib and similar cloud catalog services.
+Model Context Protocol server for **[Librarium](https://librarium.press)**, a self-hosted, privacy-focused tracker for your physical book, manga, and comic collection. A self-hosted alternative to Libib and similar cloud catalog services. iOS Lite and Librarium Plus (hosted) are on the roadmap.
 
 Chat with your library from Claude Desktop, Cursor, Claude Code, or any MCP-aware client. Go · streamable HTTP. Talks to [`librarium-api`](https://github.com/fireball1725/librarium-api) like any other client.
 
