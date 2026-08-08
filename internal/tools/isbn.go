@@ -59,14 +59,14 @@ type coverOption struct {
 type apiMergedLookup struct {
 	Title       *fieldResult  `json:"title"`
 	Subtitle    *fieldResult  `json:"subtitle"`
-	Authors     *fieldResult  `json:"authors"`      // comma-joined
+	Authors     *fieldResult  `json:"authors"` // comma-joined
 	Description *fieldResult  `json:"description"`
 	Publisher   *fieldResult  `json:"publisher"`
 	PublishDate *fieldResult  `json:"publish_date"`
 	Language    *fieldResult  `json:"language"`
 	ISBN10      *fieldResult  `json:"isbn_10"`
 	ISBN13      *fieldResult  `json:"isbn_13"`
-	PageCount   *fieldResult  `json:"page_count"`  // string-cast int
+	PageCount   *fieldResult  `json:"page_count"` // string-cast int
 	Categories  []string      `json:"categories"`
 	Covers      []coverOption `json:"covers"`
 }

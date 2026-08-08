@@ -11,8 +11,9 @@ import "strings"
 // doesn't fit the template.
 //
 // matchURI("librarium://library/abc/series/xyz",
-//          "librarium://library/{lib}/series/{sid}")
-//   → {"lib": "abc", "sid": "xyz"}, true
+//
+//	       "librarium://library/{lib}/series/{sid}")
+//	→ {"lib": "abc", "sid": "xyz"}, true
 func matchURI(uri, template string) (map[string]string, bool) {
 	uParts := strings.Split(uri, "/")
 	tParts := strings.Split(template, "/")
