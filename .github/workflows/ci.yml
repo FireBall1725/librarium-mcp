@@ -1,44 +1,16 @@
 name: CI
 
+# The jobs live in FireBall1725/workflows so every Go repo runs the same ones.
+
 on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-go@v5
-        with:
-          go-version: "1.25"
-          cache: true
-
-      # golangci-lint subsumes `go vet` (it runs vet plus errcheck,
-      # staticcheck, ineffassign, unused, bodyclose, misspell). The
-      # action handles tool install + cache.
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v7
-        with:
-          version: v2.11.4
-
-      - name: go test
-        run: go test -race -count=1 ./...
-
-  docker-build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build image (no push)
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: false
-          tags: librarium-mcp:ci
+  ci:
+    uses: FireBall1725/workflows/.github/workflows/ci-go.yml@v1

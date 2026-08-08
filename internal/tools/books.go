@@ -39,21 +39,21 @@ type BookSummary struct {
 // and interaction state so the LLM can answer "did I read it" / "what did I
 // rate it" without chaining another tool call.
 type Book struct {
-	ID            string           `json:"id"`
-	Title         string           `json:"title"`
-	Subtitle      string           `json:"subtitle,omitempty"`
-	Description   string           `json:"description,omitempty"`
-	MediaType     string           `json:"media_type,omitempty"`
-	Publisher     string           `json:"publisher,omitempty"`
-	PublishYear   int              `json:"publish_year,omitempty"`
-	Language      string           `json:"language,omitempty"`
-	Contributors  []contributorRef `json:"contributors,omitempty"`
-	Tags          []namedRef       `json:"tags,omitempty"`
-	Genres        []namedRef       `json:"genres,omitempty"`
-	Series        []seriesRef      `json:"series,omitempty"`
-	Libraries     []namedRef       `json:"libraries,omitempty"`
-	ReadStatus    string           `json:"read_status,omitempty"`
-	CoverURL      string           `json:"cover_url,omitempty"`
+	ID           string           `json:"id"`
+	Title        string           `json:"title"`
+	Subtitle     string           `json:"subtitle,omitempty"`
+	Description  string           `json:"description,omitempty"`
+	MediaType    string           `json:"media_type,omitempty"`
+	Publisher    string           `json:"publisher,omitempty"`
+	PublishYear  int              `json:"publish_year,omitempty"`
+	Language     string           `json:"language,omitempty"`
+	Contributors []contributorRef `json:"contributors,omitempty"`
+	Tags         []namedRef       `json:"tags,omitempty"`
+	Genres       []namedRef       `json:"genres,omitempty"`
+	Series       []seriesRef      `json:"series,omitempty"`
+	Libraries    []namedRef       `json:"libraries,omitempty"`
+	ReadStatus   string           `json:"read_status,omitempty"`
+	CoverURL     string           `json:"cover_url,omitempty"`
 }
 
 type contributorRef struct {
@@ -124,21 +124,21 @@ type apiPagedBooks struct {
 }
 
 type apiBook struct {
-	ID           string               `json:"id"`
-	Title        string               `json:"title"`
-	Subtitle     string               `json:"subtitle"`
-	Description  string               `json:"description"`
-	MediaType    string               `json:"media_type"`
-	Publisher    string               `json:"publisher"`
-	PublishYear  int                  `json:"publish_year"`
-	Language     string               `json:"language"`
-	Contributors []apiContributor     `json:"contributors"`
-	Tags         []apiNamed           `json:"tags"`
-	Genres       []apiNamed           `json:"genres"`
-	Series       []apiSeries          `json:"series"`
-	Libraries    []apiNamed           `json:"libraries"`
-	UserReadSt   string               `json:"user_read_status"`
-	CoverURL     string               `json:"cover_url"`
+	ID           string           `json:"id"`
+	Title        string           `json:"title"`
+	Subtitle     string           `json:"subtitle"`
+	Description  string           `json:"description"`
+	MediaType    string           `json:"media_type"`
+	Publisher    string           `json:"publisher"`
+	PublishYear  int              `json:"publish_year"`
+	Language     string           `json:"language"`
+	Contributors []apiContributor `json:"contributors"`
+	Tags         []apiNamed       `json:"tags"`
+	Genres       []apiNamed       `json:"genres"`
+	Series       []apiSeries      `json:"series"`
+	Libraries    []apiNamed       `json:"libraries"`
+	UserReadSt   string           `json:"user_read_status"`
+	CoverURL     string           `json:"cover_url"`
 }
 type apiContributor struct {
 	Name string `json:"name"`
