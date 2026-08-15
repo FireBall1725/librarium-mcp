@@ -29,7 +29,9 @@ This repo versions on its own and is not pinned to an api release.
   a `librarium-api` endpoint. If a tool needs data the API does not expose, the
   fix is an API endpoint, not a query or a join here.
 - **Self-hosted is canon.** The server talks to whatever instance the operator
-  points it at. No hosted service, no phoning home.
+  points it at. No hosted service, no phoning home. There is no paid tier and
+  no tool is gated behind one.
+- **Telemetry is opt-in and off by default.**
 - **A personal access token is the whole auth model.** The operator mints a PAT
   in the Librarium web UI and passes it as `LIBRARIUM_ACCESS_TOKEN`. Never log
   it, never echo it in an error, never write it to disk.
