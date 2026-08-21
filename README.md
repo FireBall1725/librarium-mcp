@@ -4,8 +4,6 @@ Model Context Protocol server for **[Librarium](https://librarium.press)**, a se
 
 Chat with your library from Claude Desktop, Cursor, Claude Code, or any MCP-aware client. Go · streamable HTTP. Talks to [`librarium-api`](https://github.com/fireball1725/librarium-api) like any other client.
 
-Questions, updates, and works in progress: [FireBall Codes on Discord](https://discord.gg/QpV82CFfVD).
-
 > ⚠︎ **Early beta.** Things are changing fast, some edges are rough, and self-hosters should expect to read release notes before upgrading.
 
 Part of the Librarium stack:
@@ -126,6 +124,12 @@ LIBRARIUM_MCP_DATA_DIR=./data \
 ```
 
 Health check: `curl -H "Authorization: Bearer <mcp-token>" http://localhost:8090/health`.
+
+## Support
+
+Questions, updates, and works in progress: [FireBall Codes on Discord](https://discord.gg/QpV82CFfVD).
+
+If this saved you some time, you can [buy me a sushi roll](https://ko-fi.com/fireball1725).
 
 ## License
 
