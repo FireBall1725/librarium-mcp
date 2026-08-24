@@ -39,15 +39,19 @@ Every tool inherits the permissions of the `lbrm_pat_*` token you configured, so
 
 | Tool | Args | Returns |
 |---|---|---|
-| `add_book_by_isbn` | `isbn`, `library_id`, `media_type` (novel/manga/comic/…), `format` (paperback/hardcover/ebook/audiobook) | New `{book_id, edition_id}`. Triggers metadata + cover enrichment asynchronously. |
-| `set_read_status` | `book_id`, `library_id`, `status` (unread/reading/read/did_not_finish), `edition_id?` | Updated interaction. |
-| `set_rating` | `book_id`, `library_id`, `rating` (1–10 half-star integer, or null to clear), `edition_id?` | Updated interaction. |
-| `write_review` | `book_id`, `library_id`, `notes?`, `review?`, `is_favorite?`, `edition_id?` | Updated interaction. Notes are private; review is visible to other library members. |
+| `add_book_by_isbn` | `isbn`, `library_id`, `media_type` (novel/manga/comic/…), `format` (paperback/hardcover/ebook/audiobook) | New `{book_id}`. Triggers metadata + cover enrichment asynchronously. |
+| `set_read_status` | `book_id`, `status` (unread/reading/read/did_not_finish) | Updated reading state. |
+| `set_rating` | `book_id`, `rating` (1–10 half-star integer, or null to clear) | Updated reading state. |
+| `write_review` | `book_id`, `notes?`, `review?`, `is_favorite?` | Updated reading state. Notes are private; review is visible to other library members. |
 | `create_loan` | `library_id`, `book_id`, `loaned_to`, `loaned_at?`, `due_date?`, `notes?` | Records a book lent to someone. `loaned_at` defaults to today. |
 | `mark_loan_returned` | `library_id`, `loan_id`, `returned_at?` | Marks an active loan returned. Preserves borrower / due date / notes / tags. |
 | `delete_loan` | `library_id`, `loan_id` | Removes a loan record entirely. Prefer `mark_loan_returned` for normal returns. |
 
-Write tools auto-resolve `edition_id` to the book's primary edition when it's omitted, and use a read-merge-write pattern against the api so a partial update doesn't clobber fields the caller didn't touch.
+Reading state belongs to the work, not to a printing or a library, so the three
+reading-state tools locate it with a `book_id` and nothing else. Marking a book
+read marks it read however many copies or editions are owned. Each is one
+request: the endpoint is a partial update, so a tool names only the fields it
+owns and leaves the rest alone.
 
 ## Resources
 

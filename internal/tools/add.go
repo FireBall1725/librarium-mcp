@@ -30,10 +30,9 @@ type addBookByISBNArgs struct {
 }
 
 type addBookByISBNResult struct {
-	BookID    string `json:"book_id"`
-	EditionID string `json:"edition_id"`
-	Title     string `json:"title"`
-	Message   string `json:"message"`
+	BookID  string `json:"book_id"`
+	Title   string `json:"title"`
+	Message string `json:"message"`
 }
 
 // apiMediaType is the media-types endpoint row.
@@ -65,9 +64,7 @@ type createEditionInput struct {
 	IsPrimary   bool   `json:"is_primary"`
 }
 
-// apiCreateBookResponse is what POST /libraries/{id}/books returns. The
-// server's bookBody projection doesn't include editions, so edition_id is
-// fetched separately after the create lands.
+// apiCreateBookResponse is what POST /libraries/{id}/books returns.
 type apiCreateBookResponse struct {
 	ID    string `json:"id"`
 	Title string `json:"title"`
@@ -77,7 +74,7 @@ type apiCreateBookResponse struct {
 func AddAddBookByISBN(srv *mcp.Server, client *api.Client) {
 	mcp.AddTool(srv, &mcp.Tool{
 		Name:        "add_book_by_isbn",
-		Description: "Add a book to one of the user's libraries. Looks up the ISBN through the configured metadata providers, resolves the media type name (novel/manga/comic) to the server's uuid, creates the book + first edition with the chosen format (paperback/hardcover/ebook/audiobook), and kicks off a metadata + cover enrichment job so fields fill in asynchronously. Returns the new book_id + edition_id for follow-up tool calls (set_read_status, etc.).",
+		Description: "Add a book to one of the user's libraries. Looks up the ISBN through the configured metadata providers, resolves the media type name (novel/manga/comic) to the server's uuid, creates the book + first edition with the chosen format (paperback/hardcover/ebook/audiobook), and kicks off a metadata + cover enrichment job so fields fill in asynchronously. Returns the new book_id for follow-up tool calls (set_read_status, etc.).",
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, args addBookByISBNArgs) (*mcp.CallToolResult, addBookByISBNResult, error) {
 		if args.ISBN == "" || args.LibraryID == "" || args.MediaType == "" || args.Format == "" {
 			return nil, addBookByISBNResult{}, fmt.Errorf("isbn, library_id, media_type, and format are all required")
@@ -141,25 +138,10 @@ func AddAddBookByISBN(srv *mcp.Server, client *api.Client) {
 			return nil, addBookByISBNResult{}, fmt.Errorf("creating book: %w", err)
 		}
 
-		// The create response doesn't include editions; fetch them separately
-		// to surface the edition_id for follow-up interaction tools. Non-fatal:
-		// the book is created either way, so a failure here is logged via the
-		// returned message rather than surfaced as an error.
-		editionID := ""
-		if created.ID != "" {
-			if eds, edErr := api.Get[[]apiEditionRow](ctx, client,
-				"/api/v1/libraries/"+args.LibraryID+"/books/"+created.ID+"/editions"); edErr == nil {
-				for _, e := range eds {
-					if e.IsPrimary {
-						editionID = e.ID
-						break
-					}
-				}
-				if editionID == "" && len(eds) > 0 {
-					editionID = eds[0].ID
-				}
-			}
-		}
+		// The edition listing that used to happen here is gone. It existed only
+		// to hand an edition_id to the interaction tools, and reading state is
+		// keyed to the work now, so the follow-up call needs the book_id this
+		// response already carries.
 
 		// Kick off a server-side enrichment so cover + missing metadata fill
 		// in asynchronously. Fire-and-forget; a failure here isn't fatal.
@@ -168,10 +150,9 @@ func AddAddBookByISBN(srv *mcp.Server, client *api.Client) {
 		}
 
 		return nil, addBookByISBNResult{
-			BookID:    created.ID,
-			EditionID: editionID,
-			Title:     created.Title,
-			Message:   "Added. Metadata + cover enrichment queued; refetch with get_book in a few seconds to see enriched fields.",
+			BookID:  created.ID,
+			Title:   created.Title,
+			Message: "Added. Metadata + cover enrichment queued; refetch with get_book in a few seconds to see enriched fields.",
 		}, nil
 	})
 }
