@@ -15,6 +15,16 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/fireball1725/librarium-mcp/internal/version"
+)
+
+// The client identity headers. clientName matches the vocabulary the server's
+// request logger has understood since before anything sent it: ios, web, mcp.
+const (
+	clientHeader        = "X-Librarium-Client"
+	clientVersionHeader = "X-Librarium-Client-Version"
+	clientName          = "mcp"
 )
 
 // Client is the thin Librarium HTTP client. Every outbound call carries the
@@ -144,6 +154,20 @@ func (c *Client) doRaw(ctx context.Context, method, path string, body []byte) ([
 		return nil, err
 	}
 	req.Header.Set("Authorization", "Bearer "+c.token)
+	// Identify the client and its version on every request.
+	//
+	// The server refuses first-party clients too old to understand the shapes
+	// it produces, and answers 426 with a readable message rather than letting
+	// them render blank panels that look like data loss. Sending this is what
+	// makes that possible; a request with no client header is treated as a
+	// third-party integration and left alone, which is not what MCP is.
+	//
+	// BuildVersion rather than the bare Version: for a release the two are the
+	// same string, and for a local build it carries a trailing timestamp that
+	// the server's parser already drops. Local builds are exempt from gating,
+	// so the extra text never reaches a decision.
+	req.Header.Set(clientHeader, clientName)
+	req.Header.Set(clientVersionHeader, version.BuildVersion)
 	if body != nil {
 		req.Header.Set("Content-Type", "application/json")
 	}
