@@ -89,47 +89,91 @@ func findLoanByID(ctx context.Context, client *api.Client, libraryID, loanID str
 // ─── list_loans ─────────────────────────────────────────────────────────────
 
 type listLoansArgs struct {
-	LibraryID       string `json:"library_id" jsonschema:"uuid of the library to list loans from"`
-	BookID          string `json:"book_id,omitempty" jsonschema:"optional; filter to loans of a single book"`
+	LibraryID       string `json:"library_id,omitempty" jsonschema:"optional; when omitted, covers every library the user can see"`
+	BookID          string `json:"book_id,omitempty" jsonschema:"optional; one book's loan history. Needs library_id alongside it"`
+	Borrower        string `json:"borrower,omitempty" jsonschema:"optional; match against the borrower's name or the book title"`
+	Overdue         bool   `json:"overdue,omitempty" jsonschema:"only loans past their due date"`
 	IncludeReturned bool   `json:"include_returned,omitempty" jsonschema:"include loans that have been returned (default false)"`
 }
 
 type listLoansResult struct {
 	Loans []LoanSummary `json:"loans"`
+	Total int           `json:"total,omitempty"`
 }
 
-// AddListLoans wires the list_loans tool. Default is active-only loans for
-// a library; opt in to returned via include_returned, narrow to one book
-// via book_id.
+// apiPagedLoans is what /me/loans returns. The per-library endpoint returns a
+// bare array, which is why both shapes appear below.
+type apiPagedLoans struct {
+	Items []apiLoan `json:"items"`
+	Total int       `json:"total"`
+}
+
+// AddListLoans wires the list_loans tool.
+//
+// Across every library by default. "What is overdue?" is the question this tool
+// exists to answer and it used to be unanswerable: a library was required, so
+// the assistant had to list the libraries and ask each one in turn, and overdue
+// was not a filter it could pass at all.
 func AddListLoans(srv *mcp.Server, client *api.Client) {
 	mcp.AddTool(srv, &mcp.Tool{
-		Name:        "list_loans",
-		Description: "List loans for one library. Default is active-only (currently lent out). Pass include_returned=true to include returned loans, and book_id to narrow to a single book's loan history.",
+		Name: "list_loans",
+		Description: "List loans across every library the user can see, or one library with library_id. " +
+			"Default is active-only (currently lent out). Pass overdue=true for loans past their due date, " +
+			"borrower to match a person's name or a book title, include_returned=true to include returned " +
+			"loans, and book_id (with library_id) for one book's loan history.",
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, args listLoansArgs) (*mcp.CallToolResult, listLoansResult, error) {
-		if args.LibraryID == "" {
-			return nil, listLoansResult{}, errors.New("library_id is required")
-		}
 		q := url.Values{}
 		if args.IncludeReturned {
 			q.Set("include_returned", "true")
 		}
+
+		// One book's history still goes through its library: /me/loans has no
+		// book_id filter, and dropping the argument silently would answer a
+		// question about one book with every loan in the collection.
 		if args.BookID != "" {
+			if args.LibraryID == "" {
+				return nil, listLoansResult{}, errors.New(
+					"book_id needs library_id alongside it; a book's loan history is read through the library that owns it")
+			}
 			q.Set("book_id", args.BookID)
+			path := fmt.Sprintf("/api/v1/libraries/%s/loans", args.LibraryID)
+			if enc := q.Encode(); enc != "" {
+				path += "?" + enc
+			}
+			loans, err := api.Get[[]apiLoan](ctx, client, path)
+			if err != nil {
+				return nil, listLoansResult{}, err
+			}
+			return nil, listLoansResult{Loans: projectLoans(loans), Total: len(loans)}, nil
 		}
-		path := fmt.Sprintf("/api/v1/libraries/%s/loans", args.LibraryID)
+
+		if args.LibraryID != "" {
+			q.Set("lib", args.LibraryID)
+		}
+		if args.Overdue {
+			q.Set("overdue", "true")
+		}
+		if args.Borrower != "" {
+			q.Set("q", args.Borrower)
+		}
+		path := "/api/v1/me/loans"
 		if enc := q.Encode(); enc != "" {
 			path += "?" + enc
 		}
-		loans, err := api.Get[[]apiLoan](ctx, client, path)
+		paged, err := api.Get[apiPagedLoans](ctx, client, path)
 		if err != nil {
 			return nil, listLoansResult{}, err
 		}
-		out := make([]LoanSummary, len(loans))
-		for i, l := range loans {
-			out[i] = projectLoan(l)
-		}
-		return nil, listLoansResult{Loans: out}, nil
+		return nil, listLoansResult{Loans: projectLoans(paged.Items), Total: paged.Total}, nil
 	})
+}
+
+func projectLoans(in []apiLoan) []LoanSummary {
+	out := make([]LoanSummary, len(in))
+	for i, l := range in {
+		out[i] = projectLoan(l)
+	}
+	return out
 }
 
 // ─── create_loan ────────────────────────────────────────────────────────────
