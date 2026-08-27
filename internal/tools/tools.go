@@ -8,7 +8,7 @@
 //
 // v1 catalogue:
 //   - reads:  list_libraries, search_books, get_book, lookup_isbn,
-//     get_recent_suggestions, list_loans
+//     get_recent_suggestions, list_series, get_series, list_loans
 //   - writes: add_book_by_isbn, set_read_status, set_rating, write_review,
 //     create_loan, mark_loan_returned, delete_loan
 package tools
@@ -28,6 +28,10 @@ func RegisterAll(srv *mcp.Server, client *api.Client) {
 	AddGetBook(srv, client)
 	AddLookupISBN(srv, client)
 	AddGetRecentSuggestions(srv, client)
+
+	// Series
+	AddListSeries(srv, client)
+	AddGetSeries(srv, client)
 
 	// Loans
 	AddListLoans(srv, client)
