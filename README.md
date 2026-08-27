@@ -29,9 +29,11 @@ Every tool inherits the permissions of the `lbrm_pat_*` token you configured, so
 | Tool | Args | Returns |
 |---|---|---|
 | `list_libraries` | — | Libraries the current user can access (id, name, description). |
-| `search_books` | `query`, `library_id?`, `limit?` (default 25, max 100) | Compact book summaries. Scopes to one library or fans out across all. |
+| `search_books` | `query?`, `author?`, `tag?`, `genre?`, `media_type?`, `read_status?`, `library_id?`, `include?` (shelf/wishlist/suggested/gap/any), `limit?` (default 25, max 100) | Compact book summaries, ranked together across every library the user can read. |
 | `get_book` | `book_id` | Full book record: contributors, tags, genres, series, libraries, your read status. |
 | `lookup_isbn` | `isbn` | Provider-merged catalog lookup (Google Books, Open Library, Hardcover, …). Same call the iOS scan flow uses. |
+| `list_series` | `query?`, `library_id?`, `genre?`, `media_type?`, `status?`, `incomplete?`, `sort?` (name/volumes/missing/read/rating), `limit?` | Each run with how many volumes are held and how many are missing. `incomplete` drops the complete ones. |
+| `get_series` | `series_id?` or `name?`, `only?` (all/missing/held) | The volumes of one run in order, saying which are on the shelf and which are not. |
 | `get_recent_suggestions` | `limit?` (default 5, max 25) | Recent AI suggestion runs with their books, reasoning, and per-suggestion status. |
 | `list_loans` | `library_id`, `book_id?`, `include_returned?` | Active-only by default; opt-in to returned, narrow to one book. |
 
